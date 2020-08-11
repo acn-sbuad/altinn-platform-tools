@@ -1,41 +1,41 @@
 ﻿using System;
 using System.IO;
-using Azure.Core;
-using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Identity.Web;
+using PlatformRestore.Configuration;
 using PlatformRestore.Services;
+using PlatformRestore.Services.Interfaces;
 
 namespace PlatformRestore
 {
-    class Program
+    /// <summary>
+    /// Program.
+    /// </summary>
+    public class Program
     {
-        private static string prompt = "Altinn Platform Restore > ";
-        private static ILogger<Program> _logger;
+        private static readonly string _prompt = "Altinn Platform Restore > ";
+        private static IConfigurationRoot _configuration;
 
-        static void Main()
+        /// <summary>
+        /// Main method.
+        /// </summary>
+        public static void Main()
         {
             ConfigureSetupLogging();
+            _configuration = BuildConfiguration();
+
             IServiceCollection services = GetAndRegisterServices();
 
             ServiceProvider serviceProvider = services.BuildServiceProvider();
-
-            IConfigurationRoot configuration = BuildConfiguration();
+            serviceProvider.GetService<ILoggerFactory>();
 
             var app = serviceProvider.GetService<ApplicationManager>();
-            // app.SetEnvironment(configuration, serviceProvider);
-
-            /*
-
-                        Console.WriteLine("Your token will expire: {0}", token.ExpiresOn.ToLocalTime());
-            */
 
             string args;
             while (true)
             {
-                Console.Write(prompt);
+                Console.Write(_prompt);
                 args = Console.ReadLine();
                 try
                 {
@@ -62,33 +62,34 @@ namespace PlatformRestore
         /// </summary>
         public static void ConfigureSetupLogging()
         {
-            // Setup logging for the web host creation
-            var logFactory = LoggerFactory.Create(builder =>
-            {
-                builder
-                    .AddFilter("Altinn.Platform.Restore.Program", LogLevel.Debug)
-                    .AddConsole();
-            });
+            /* // Setup logging for the web host creation
+             var logFactory = LoggerFactory.Create(builder =>
+             {
+                 builder
+                     .AddFilter("Altinn.Platform.Restore.Program", LogLevel.Debug)
+                     .AddConsole();
+             });
 
-            _logger = logFactory.CreateLogger<Program>();
+             _logger = logFactory.CreateLogger<Program>();*/
         }
 
         private static IServiceCollection GetAndRegisterServices()
         {
             IServiceCollection services = new ServiceCollection();
 
-            services.AddLogging(configure =>
-            {
-                configure.ClearProviders();
-                configure.AddConsole();
-            }).AddTransient<ApplicationManager>();
-
+            services.AddLogging();
             services.AddTransient<ApplicationManager>();
             services.AddSingleton<IAccessTokenService, AccessTokenService>();
             services.AddSingleton<IBlobService, BlobService>();
+            services.AddSingleton<ICosmosService, CosmosService>();
+            services.AddSingleton<IBlobContainerClientProvider, BlobContainerClientProvider>();
+            services.AddSingleton<IDocumentClientProvider, DocumentClientProvider>();
+
+            services.Configure<GeneralSettings>(_configuration.GetSection("GeneralSettings"));
+            services.Configure<AzureStorageConfiguration>(_configuration.GetSection("AzureStorageConfiguration"));
+            services.Configure<AzureCosmosConfiguration>(_configuration.GetSection("AzureCosmosConfiguration"));
+
             return services;
         }
     }
-
-
 }

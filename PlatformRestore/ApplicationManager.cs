@@ -1,35 +1,51 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using System.Threading.Tasks;
+
+using Azure.Core;
+
 using PlatformRestore.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using PlatformRestore.Services.Interfaces;
 
 namespace PlatformRestore
 {
+    /// <summary>
+    /// Application manager. Logic for the console app
+    /// </summary>
     public class ApplicationManager
     {
-        private readonly ILogger<ApplicationManager> _logger;
         private readonly IAccessTokenService _accessTokenService;
         private readonly IBlobService _blobService;
+        private readonly ICosmosService _cosmosService;
 
-        public ApplicationManager(ILogger<ApplicationManager> logger, IAccessTokenService accessTokenService, IBlobService blobService)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApplicationManager"/> class.
+        /// </summary>  
+        public ApplicationManager(IAccessTokenService accessTokenService, IBlobService blobService, ICosmosService cosmosService)
         {
-            _logger = logger;
             _accessTokenService = accessTokenService;
             _blobService = blobService;
+            _cosmosService = cosmosService;
         }
 
-        public void Execute(string args)
+        /// <summary>
+        /// Execute
+        /// </summary>
+        /// <param name="args">arguments</param>
+        /// <returns></returns>
+        public async Task Execute(string args)
         {
             string[] input = args.ToLower().Split(' ');
 
             switch (input[0])
             {
                 case "login":
-                    _accessTokenService.GetToken();
+                    await _accessTokenService.GetToken(new TokenRequestContext(new string[] { }));
                     break;
                 case "blob":
-                    _blobService.ListBlobs();
+                    await _blobService.ListBlobs();
+                    break;
+                case "cosmos":
+                    await _cosmosService.ListDeletedInstances();
                     break;
                 default:
                     Console.WriteLine($"Unknown argument {args}. Please try again.");

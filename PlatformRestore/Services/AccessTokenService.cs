@@ -1,58 +1,44 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
-using Microsoft.Identity.Client;
+using Microsoft.Extensions.Options;
+using PlatformRestore.Configuration;
 
 namespace PlatformRestore.Services
 {
+    /// <inheritdoc/>
     public class AccessTokenService : IAccessTokenService
     {
-        private string _accessTokenString;
         private InteractiveBrowserCredential _credential;
-        private string _clientId = "6840fb87-7b9d-4775-b073-5fdf577c4820";
-        private string _tenantId = "cd0026d8-283b-4a55-9bfa-d0ef4a8ba21c";
-        private string[] _scopes = new string[] { "User.Read" };
 
-
-        public void InvalidateToken()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccessTokenService"/> class.
+        /// </summary>
+        /// <param name="settings">The general settings.</param>
+        public AccessTokenService(IOptions<GeneralSettings> settings)
         {
-            _accessTokenString = string.Empty;
+            GeneralSettings generalSettings = settings.Value;
+            _credential = new InteractiveBrowserCredential(generalSettings.TenantId, generalSettings.ClientId);
+        }
+
+        /// <inheritdoc/>
+        public void InvalidateCredentials()
+        {
             _credential = null;
         }
 
-        public async Task<string> GetToken()
+        /// <inheritdoc/>
+        public async Task<string> GetToken(TokenRequestContext requestContext)
         {
-            var clientId = "6840fb87-7b9d-4775-b073-5fdf577c4820";
+            AccessToken token = await _credential.GetTokenAsync(requestContext);
 
-            // Using token acuisition. Must figure out how to DI into clas
-            /*
-            var tenant = "cd0026d8-283b-4a55-9bfa-d0ef4a8ba21c";
-            return await _tokenAcquisition.GetAccessTokenForUserAsync(scopes, tenant);*/
-
-
-            // using azure identity
-            if (string.IsNullOrEmpty(_accessTokenString))
-            {
-                var credentials = new InteractiveBrowserCredential(clientId);
-                var token = await credentials.GetTokenAsync(new TokenRequestContext());
-                _accessTokenString = token.Token;
-            }
-
-            return _accessTokenString;
+            return token.Token;
         }
 
-        public async Task<InteractiveBrowserCredential> GetCredentials()
+        /// <inheritdoc/>
+        public InteractiveBrowserCredential GetCredential()
         {
-            if (_credential == null)
-            {
-                _credential = new InteractiveBrowserCredential(_clientId);
-              //  await _credential.GetTokenAsync(new TokenRequestContext());
-            }
-
             return _credential;
         }
     }
 }
-

@@ -1,11 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Threading.Tasks;
 
 namespace PlatformRestore.Services
 {
+    /// <summary>
+    /// The service that handles all interaction with Azure Blob Storage.
+    /// </summary>
     public interface IBlobService
     {
-        public System.Threading.Tasks.Task<bool> ListBlobs();
+        /// <summary>
+        /// Lists all blobs.
+        /// </summary>
+        public Task ListBlobs();
     }
 }
