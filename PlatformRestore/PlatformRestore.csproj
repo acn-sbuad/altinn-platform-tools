@@ -10,17 +10,13 @@
     <PackageReference Include="Azure.Identity" Version="1.1.1" />
     <PackageReference Include="Azure.ResourceManager.Storage" Version="1.0.0-preview.1" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.4.4" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="3.0.0" />
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.11.5" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-  
-  <ItemGroup Condition="'$(Configuration)'=='Debug'">
-    <AdditionalFiles Include="stylecop.json">
-      <Link>stylecop.json</Link>
-    </AdditionalFiles>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">

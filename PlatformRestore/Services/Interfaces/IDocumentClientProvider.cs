@@ -20,5 +20,10 @@ namespace PlatformRestore.Services.Interfaces
         /// </summary>
         /// <param name="environment">The environment.</param>
         void InvalidateDocumentClient(string environment);
+
+        /// <summary>
+        /// Deletes all cached document clientes.
+        /// </summary>
+        void RemoveDobumentClients();
     }
 }

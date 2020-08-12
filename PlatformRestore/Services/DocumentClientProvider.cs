@@ -63,7 +63,7 @@ namespace PlatformRestore.Services
                     config.PrimaryKey = responseObject["primaryMasterKey"].ToString();
                     _accountConfig[environment].PrimaryKey = config.PrimaryKey;
 
-                    documentClient = new DocumentClient(new Uri("https://altinn-tt02-cosmos-db.documents.azure.com:443/"), config.PrimaryKey, connectionPolicy);
+                    documentClient = new DocumentClient(new Uri($"https://altinn-{environment}-cosmos-db.documents.azure.com:443/"), config.PrimaryKey, connectionPolicy);
                     _clients.Add(environment, documentClient);
                 }
 
@@ -81,6 +81,12 @@ namespace PlatformRestore.Services
         public void InvalidateDocumentClient(string environment)
         {
             _clients.Remove(environment);
+        }
+
+        /// <inheritdoc/>
+        public void RemoveDobumentClients()
+        {
+            _clients.Clear();
         }
     }
 }

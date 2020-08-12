@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
+using Microsoft.Azure.Documents.SystemFunctions;
 using Microsoft.Extensions.Options;
 using PlatformRestore.Configuration;
 
@@ -10,6 +11,7 @@ namespace PlatformRestore.Services
     public class AccessTokenService : IAccessTokenService
     {
         private InteractiveBrowserCredential _credential;
+        private readonly GeneralSettings _settings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AccessTokenService"/> class.
@@ -17,8 +19,7 @@ namespace PlatformRestore.Services
         /// <param name="settings">The general settings.</param>
         public AccessTokenService(IOptions<GeneralSettings> settings)
         {
-            GeneralSettings generalSettings = settings.Value;
-            _credential = new InteractiveBrowserCredential(generalSettings.TenantId, generalSettings.ClientId);
+            _settings = settings.Value;
         }
 
         /// <inheritdoc/>
@@ -30,7 +31,7 @@ namespace PlatformRestore.Services
         /// <inheritdoc/>
         public async Task<string> GetToken(TokenRequestContext requestContext)
         {
-            AccessToken token = await _credential.GetTokenAsync(requestContext);
+            AccessToken token = await GetCredential().GetTokenAsync(requestContext);
 
             return token.Token;
         }
@@ -38,6 +39,11 @@ namespace PlatformRestore.Services
         /// <inheritdoc/>
         public InteractiveBrowserCredential GetCredential()
         {
+            if (_credential == null)
+            {
+                _credential = new InteractiveBrowserCredential(_settings.TenantId, _settings.ClientId);
+            }
+
             return _credential;
         }
     }

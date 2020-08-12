@@ -1,8 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
+
+using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+
+using PlatformRestore.Commands.Settings;
+using PlatformRestore.Commands.Storage;
 using PlatformRestore.Configuration;
 using PlatformRestore.Services;
 using PlatformRestore.Services.Interfaces;
@@ -14,36 +19,60 @@ namespace PlatformRestore
     /// </summary>
     public class Program
     {
-        private static readonly string _prompt = "Altinn Platform Restore > ";
+        /// <summary>
+        /// Set environment
+        /// </summary>
+        public static string Environment { get; set; }
+
+        private static readonly string _prompt = "Altinn Platform Restore";
         private static IConfigurationRoot _configuration;
+        private static CommandLineApplication<Settings> settingsCmd = new CommandLineApplication<Settings>();
+        private static CommandLineApplication<Storage> storageCmd = new CommandLineApplication<Storage>();
 
         /// <summary>
-        /// Main method.
+        /// Documented
         /// </summary>
-        public static void Main()
+        public static async Task Main()
         {
-            ConfigureSetupLogging();
             _configuration = BuildConfiguration();
-
             IServiceCollection services = GetAndRegisterServices();
-
             ServiceProvider serviceProvider = services.BuildServiceProvider();
-            serviceProvider.GetService<ILoggerFactory>();
 
-            var app = serviceProvider.GetService<ApplicationManager>();
+            storageCmd.Conventions
+                .UseDefaultConventions()
+                .UseConstructorInjection(serviceProvider)
+                .UseOnValidateMethodFromModel();
 
-            string args;
+            settingsCmd.Conventions
+            .UseDefaultConventions()
+            .UseConstructorInjection(serviceProvider);
+
             while (true)
             {
-                Console.Write(_prompt);
-                args = Console.ReadLine();
-                try
+                if (string.IsNullOrEmpty(Environment))
                 {
-                    app.Execute(args);
+                    Console.Write($"{_prompt}> ");
                 }
-                catch (Exception ex)
+                else
                 {
-                    Console.WriteLine($@"Error : {ex.Message}");
+                    Console.Write($"{_prompt} [{Environment}]> ");
+                }
+
+                string[] args = Console.ReadLine().Trim().Split(' ');
+
+                switch (args[0].ToLower())
+                {
+                    case "storage":
+                        await storageCmd.ExecuteAsync(args);
+                        break;
+                    case "settings":
+                        await settingsCmd.ExecuteAsync(args);
+                        break;
+                    case "exit":
+                        return;
+                    default:
+                        Console.WriteLine($"Unknown argument {string.Join(" ", args)}, Valid commands are storage and settings.");
+                        break;
                 }
             }
         }
@@ -57,31 +86,16 @@ namespace PlatformRestore
             return builder.Build();
         }
 
-        /// <summary>
-        /// Configure logging for setting up application. Temporary
-        /// </summary>
-        public static void ConfigureSetupLogging()
-        {
-            /* // Setup logging for the web host creation
-             var logFactory = LoggerFactory.Create(builder =>
-             {
-                 builder
-                     .AddFilter("Altinn.Platform.Restore.Program", LogLevel.Debug)
-                     .AddConsole();
-             });
-
-             _logger = logFactory.CreateLogger<Program>();*/
-        }
-
         private static IServiceCollection GetAndRegisterServices()
         {
             IServiceCollection services = new ServiceCollection();
 
             services.AddLogging();
-            services.AddTransient<ApplicationManager>();
+
+            services.AddScoped<IBlobService, BlobService>();
+            services.AddScoped<ICosmosService, CosmosService>();
+
             services.AddSingleton<IAccessTokenService, AccessTokenService>();
-            services.AddSingleton<IBlobService, BlobService>();
-            services.AddSingleton<ICosmosService, CosmosService>();
             services.AddSingleton<IBlobContainerClientProvider, BlobContainerClientProvider>();
             services.AddSingleton<IDocumentClientProvider, DocumentClientProvider>();
 

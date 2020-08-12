@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+using Altinn.Platform.Storage.Interface.Models;
 
 namespace PlatformRestore.Services.Interfaces
 {
@@ -8,8 +11,13 @@ namespace PlatformRestore.Services.Interfaces
     public interface ICosmosService
     {
         /// <summary>
-        /// Lists deleted instances 
+        /// List the data guid for all active blobs for the given instance.
         /// </summary>
-        public Task ListDeletedInstances();
+        public Task<List<string>> ListDataElements(string instanceGuid);
+
+        /// <summary>
+        /// Gets metadata for the given data element.
+        /// </summary>
+        public Task<DataElement> GetDataElement(string dataGuid, string instanceGuid);
     }
 }

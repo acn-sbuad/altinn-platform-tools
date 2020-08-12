@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PlatformRestore.Services
 {
@@ -7,9 +8,5 @@ namespace PlatformRestore.Services
     /// </summary>
     public interface IBlobService
     {
-        /// <summary>
-        /// Lists all blobs.
-        /// </summary>
-        public Task ListBlobs();
     }
 }

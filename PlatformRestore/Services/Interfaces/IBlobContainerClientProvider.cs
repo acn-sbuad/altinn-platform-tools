@@ -22,5 +22,10 @@ namespace PlatformRestore.Services.Interfaces
         /// <param name="org">The organisation that owns the blob container.</param>
         /// <param name="environment">The environment.</param>
         void InvalidateBlobClient(string org, string environment);
+
+        /// <summary>
+        /// Deletes all cached blob clientes.
+        /// </summary>
+        void RemoveBlobClients();
     }
 }

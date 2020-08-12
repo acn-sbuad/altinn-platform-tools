@@ -73,5 +73,11 @@ namespace PlatformRestore.Services
             string key = $"{org}-{environment}";
             _clients.Remove(key);
         }
+
+        /// <inheritdoc/>
+        public void RemoveBlobClients()
+        {
+            _clients.Clear();
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using PlatformRestore.Services.Interfaces;
@@ -19,10 +20,9 @@ namespace PlatformRestore.Services
             _clientProvider = clientProvider;
         }
 
-        /// <inheritdoc/>
-        public async Task ListBlobs()
+        private async Task ListBlobs()
         {
-            BlobContainerClient container = await _clientProvider.GetBlobClient("digdir", "tt02");
+            BlobContainerClient container = await _clientProvider.GetBlobClient("digdir", Program.Environment);
 
             // looping through the blobs in the container doesn't seem to work.
             await foreach (Azure.Storage.Blobs.Models.BlobItem item in container.GetBlobsAsync())
