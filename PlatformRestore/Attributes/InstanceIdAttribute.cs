@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace PlatformRestore.Attributes
 {
     /// <summary>
-    /// InstanceId Attribute class.
+    /// InstanceId validation attribute.
     /// </summary>
     public class InstanceIdAttribute : ValidationAttribute
     {

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using Azure.Storage.Blobs.Models;
 using McMaster.Extensions.CommandLineUtils;
-
 using PlatformRestore.Attributes;
+using PlatformRestore.Enums;
+using PlatformRestore.Services;
 using PlatformRestore.Services.Interfaces;
 
 namespace PlatformRestore.Commands.Storage.Data
@@ -28,7 +29,7 @@ namespace PlatformRestore.Commands.Storage.Data
             ShowInHelpText = true,
             Description = "InstanceId [instanceOwner.partyId/instanceGuid] for the instance the dataElement is connected to.")]
         [InstanceId]
-        public string InstanceId { get; set; }
+        public string InstanceId { get; set; } 
 
         /// <summary>
         /// Instance guid
@@ -42,14 +43,51 @@ namespace PlatformRestore.Commands.Storage.Data
         [Guid]
         public string InstanceGuid { get; set; }
 
+        /// <summary>
+        /// The state of the data element. 
+        /// Active or deleted.
+        /// </summary>
+        [Option(
+            CommandOptionType.SingleValue,
+            ShortName = "ds",
+            LongName = "dataState",
+            ShowInHelpText = true,
+            Description = "State of the data element. Active or deleted. Use All for both states.")]
+        [AllowedValues("all", "active", "deleted", IgnoreCase = true)]
+        public string DataState { get; set; } = "active";
+
+        /// <summary>
+        /// The organisation. 
+        /// </summary>
+        [Option(
+          CommandOptionType.SingleValue,
+          ShortName = "org",
+          LongName = "organisation",
+          ShowInHelpText = true,
+          Description = "Organisation.")]
+        public string Org { get; set; }
+
+        /// <summary>
+        /// The application. 
+        /// </summary>
+        [Option(
+         CommandOptionType.SingleValue,
+         ShortName = "app",
+         LongName = "application",
+         ShowInHelpText = true,
+         Description = "Application.")]
+        public string App { get; set; }
+
         private readonly ICosmosService _comsosService;
+        private readonly IBlobService _blobService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="List"/> class.
         /// </summary>
-        public List(ICosmosService cosmosService)
+        public List(ICosmosService cosmosService, IBlobService blobService)
         {
             _comsosService = cosmosService;
+            _blobService = blobService;
         }
 
         /// <inheritdoc/>    
@@ -68,9 +106,49 @@ namespace PlatformRestore.Commands.Storage.Data
                 return;
             }
 
+            if ((DataState.Equals("deleted") || DataState.Equals("all")) && (string.IsNullOrEmpty(Org) || string.IsNullOrEmpty(App)))
+            {
+                Console.WriteLine("Please provide org and app when listing deleted data elements.");
+                return;
+            }
+
             string instanceGuid = InstanceGuid ?? InstanceId.Split('/')[1];
 
-            await ListActiveDataElements(instanceGuid);
+            switch (DataState.ToLower())
+            {
+                case "deleted":
+                    await ListDataElements(Org, App, instanceGuid, ElementState.Deleted);
+                    break;
+                case "all":
+                    await ListDataElements(Org, App, instanceGuid, ElementState.All);
+                    break;
+                case "active":
+                default:
+                    await ListActiveDataElements(instanceGuid);
+                    break;
+            }
+
+            CleanUp();
+        }
+
+        private async Task ListDataElements(string org, string app, string instanceGuid, ElementState state)
+        {
+            List<BlobItem> blobs = await _blobService.ListBlobs(org, app, instanceGuid, state);
+
+            if (blobs.Count == 0)
+            {
+                Console.WriteLine($"No data elements in state {DataState} found for instance {org}/{app}/{instanceGuid} in {Program.Environment}. \n");
+                return;
+            }
+
+            Console.WriteLine($"Data elements for instanceGuid {instanceGuid}:");
+
+            foreach (BlobItem item in blobs)
+            {
+                Console.WriteLine($"\t {item.Name.Split('/')[4]} \t Deleted:{item.Deleted} ");
+            }
+
+            Console.WriteLine(string.Empty);
         }
 
         private async Task ListActiveDataElements(string instanceGuid)
@@ -79,10 +157,17 @@ namespace PlatformRestore.Commands.Storage.Data
             {
                 List<string> dataGuids = await _comsosService.ListDataElements(instanceGuid);
 
-                Console.WriteLine($"\n \n Active data elements for instanceGuid {instanceGuid}:");
-                foreach (string id in dataGuids)
+                if (dataGuids.Count > 0)
                 {
-                    Console.WriteLine("\t" + id);
+                    Console.WriteLine($"Active data elements for instanceGuid {instanceGuid}:");
+                    foreach (string id in dataGuids)
+                    {
+                        Console.WriteLine("\t" + id);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"No active data elements were found for instanceGuid \"{instanceGuid}\"");
                 }
 
                 Console.WriteLine();
@@ -91,6 +176,12 @@ namespace PlatformRestore.Commands.Storage.Data
             {
                 Console.WriteLine(e);
             }
+        }
+
+        private void CleanUp()
+        {
+            InstanceId = InstanceGuid = Org = App = null;
+            DataState = "active";
         }
     }
 }

@@ -77,6 +77,11 @@ namespace PlatformRestore.Services
         /// <inheritdoc/>
         public void RemoveBlobClients()
         {
+            foreach (var entry in _accountConfig)
+            {
+                entry.Value.AccountKey = string.Empty;
+            }
+
             _clients.Clear();
         }
     }

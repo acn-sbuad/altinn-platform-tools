@@ -31,7 +31,7 @@ namespace PlatformRestore.Commands.Settings.Subcommands
         }
 
         /// <summary>
-        /// Prompts user for credentials.
+        /// Logs in the user. User will be propmpted for credentials.
         /// </summary>
         protected override async Task OnExecuteAsync(CommandLineApplication app)
         {

@@ -4,14 +4,14 @@ using Microsoft.Azure.Documents.Client;
 namespace PlatformRestore.Services.Interfaces
 {
     /// <summary>
-    /// Service that provides and administers DocumentClients for Azure Cosmos DB.
+    /// Service that provides and administers Azure CosmosDB document clients.
     /// </summary>
     public interface IDocumentClientProvider
     {
         /// <summary>
         /// Retrieves a document client for the given context.
         /// </summary>
-        /// <param name="environment">The environment.</param>
+        /// <param name="environment">The environment the database exists in.</param>
         /// <returns>The document client.</returns>
         Task<DocumentClient> GetDocumentClient(string environment);
 
@@ -22,8 +22,8 @@ namespace PlatformRestore.Services.Interfaces
         void InvalidateDocumentClient(string environment);
 
         /// <summary>
-        /// Deletes all cached document clientes.
+        /// Deletes all cached document clients and the database primary keys.
         /// </summary>
-        void RemoveDobumentClients();
+        void RemoveDocumentClients();
     }
 }

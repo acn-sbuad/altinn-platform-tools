@@ -5,13 +5,13 @@ using McMaster.Extensions.CommandLineUtils;
 namespace PlatformRestore.Commands.Storage.Instance
 {
     /// <summary>
-    /// Instance 
+    /// Instance command handler. Subcommand of Storage.
     /// </summary>
     [Command(
       Name = "instance",
       OptionsComparison = StringComparison.InvariantCultureIgnoreCase,
       UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.CollectAndContinue)]
-    [Subcommand(typeof(List))]
+    [Subcommand(typeof(List), typeof(Info))]
     public class Instance : IBaseCmd
     {
         /// <inheritdoc/>    

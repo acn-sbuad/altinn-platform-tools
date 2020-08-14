@@ -84,8 +84,13 @@ namespace PlatformRestore.Services
         }
 
         /// <inheritdoc/>
-        public void RemoveDobumentClients()
+        public void RemoveDocumentClients()
         {
+            foreach (var entry in _accountConfig)
+            {
+                entry.Value.PrimaryKey = string.Empty;
+            }  
+
             _clients.Clear();
         }
     }

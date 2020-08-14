@@ -6,7 +6,7 @@ using System.Text;
 namespace PlatformRestore.Attributes
 {
     /// <summary>
-    /// InstanceGuid Attribute class.
+    /// Guid valiation attribute.
     /// </summary>
     public class GuidAttribute : ValidationAttribute
     {

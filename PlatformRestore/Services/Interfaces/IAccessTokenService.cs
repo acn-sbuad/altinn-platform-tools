@@ -8,7 +8,7 @@ using Azure.Identity;
 namespace PlatformRestore.Services
 {
     /// <summary>
-    /// Service that handles all authorization towards Azure AD.
+    /// Service that handles authorization towards Azure AD.
     /// </summary>
     public interface IAccessTokenService
     {

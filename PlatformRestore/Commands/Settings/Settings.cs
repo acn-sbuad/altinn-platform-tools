@@ -7,7 +7,7 @@ using PlatformRestore.Commands.Settings.Subcommands;
 namespace PlatformRestore.Commands.Settings
 {
     /// <summary>
-    /// Settings root command
+    /// Settings root command.
     /// </summary>
     [Command(
        Name = "settings",

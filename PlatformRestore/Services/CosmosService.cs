@@ -28,10 +28,15 @@ namespace PlatformRestore.Services.Interfaces
             _dataCollectionUri = UriFactory.CreateDocumentCollectionUri("Storage", "dataElements");
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets metadata for the given data element.
+        /// </summary>
+        /// <remarks>
+        /// Include instanceGuid to avoid a cross partition query.
+        /// </remarks>
         public async Task<DataElement> GetDataElement(string dataGuid, string instanceGuid = "")
         {
-            DataElement dataElement = new DataElement();
+            DataElement dataElement = null;
 
             Uri uri = UriFactory.CreateDocumentUri("Storage", "dataElements", dataGuid);
             DocumentClient client = await _clientProvider.GetDocumentClient(Program.Environment);
@@ -48,7 +53,10 @@ namespace PlatformRestore.Services.Interfaces
                     .AsDocumentQuery();
 
                 FeedResponse<DataElement> result = await query.ExecuteNextAsync<DataElement>();
-                dataElement = result.First();
+                if (result.Count > 0)
+                {
+                    dataElement = result.First();
+                }
             }
 
             return dataElement;

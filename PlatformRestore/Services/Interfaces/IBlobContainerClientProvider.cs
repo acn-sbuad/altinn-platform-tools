@@ -4,7 +4,7 @@ using Azure.Storage.Blobs;
 namespace PlatformRestore.Services.Interfaces
 {
     /// <summary>
-    /// Service that provides and administers BlobContainerClients for Azure Blob Storage.
+    /// Service that provides and administers Azure BlobContainerClients.
     /// </summary>
     public interface IBlobContainerClientProvider
     {
@@ -12,7 +12,7 @@ namespace PlatformRestore.Services.Interfaces
         /// Retrieves a blob client for the given context.
         /// </summary>
         /// <param name="org">The organisation that owns the blob container.</param>
-        /// <param name="environment">The environment.</param>
+        /// <param name="environment">The environment the container exists in.</param>
         /// <returns>The blob container client.</returns>
         Task<BlobContainerClient> GetBlobClient(string org, string environment);
 
@@ -24,7 +24,7 @@ namespace PlatformRestore.Services.Interfaces
         void InvalidateBlobClient(string org, string environment);
 
         /// <summary>
-        /// Deletes all cached blob clientes.
+        /// Deletes all cached blob clients and their storage account keys.
         /// </summary>
         void RemoveBlobClients();
     }

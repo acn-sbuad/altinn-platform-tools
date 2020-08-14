@@ -20,17 +20,17 @@ namespace PlatformRestore
     public class Program
     {
         /// <summary>
-        /// Set environment
+        /// Global environment used in commands.
         /// </summary>
         public static string Environment { get; set; }
 
-        private static readonly string _prompt = "Altinn Platform Restore";
+        private static readonly string _prompt = "Altinn Platform Restore";     
+        private static readonly CommandLineApplication<Settings> _settingsCmd = new CommandLineApplication<Settings>();
+        private static readonly CommandLineApplication<Storage> _storageCmd = new CommandLineApplication<Storage>();
         private static IConfigurationRoot _configuration;
-        private static CommandLineApplication<Settings> settingsCmd = new CommandLineApplication<Settings>();
-        private static CommandLineApplication<Storage> storageCmd = new CommandLineApplication<Storage>();
 
         /// <summary>
-        /// Documented
+        /// Main method.
         /// </summary>
         public static async Task Main()
         {
@@ -38,12 +38,11 @@ namespace PlatformRestore
             IServiceCollection services = GetAndRegisterServices();
             ServiceProvider serviceProvider = services.BuildServiceProvider();
 
-            storageCmd.Conventions
+            _storageCmd.Conventions
                 .UseDefaultConventions()
-                .UseConstructorInjection(serviceProvider)
-                .UseOnValidateMethodFromModel();
+                .UseConstructorInjection(serviceProvider);
 
-            settingsCmd.Conventions
+            _settingsCmd.Conventions
             .UseDefaultConventions()
             .UseConstructorInjection(serviceProvider);
 
@@ -63,10 +62,10 @@ namespace PlatformRestore
                 switch (args[0].ToLower())
                 {
                     case "storage":
-                        await storageCmd.ExecuteAsync(args);
+                        await _storageCmd.ExecuteAsync(args);
                         break;
                     case "settings":
-                        await settingsCmd.ExecuteAsync(args);
+                        await _settingsCmd.ExecuteAsync(args);
                         break;
                     case "exit":
                         return;

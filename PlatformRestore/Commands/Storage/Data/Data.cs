@@ -5,7 +5,7 @@ using McMaster.Extensions.CommandLineUtils;
 namespace PlatformRestore.Commands.Storage.Data
 {
     /// <summary>
-    /// Data command
+    /// Data command handler. Subcommand of Storage.
     /// </summary>
     [Command(
       Name = "data",

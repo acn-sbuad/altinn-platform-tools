@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
-using Microsoft.Azure.Documents.SystemFunctions;
 using Microsoft.Extensions.Options;
 using PlatformRestore.Configuration;
 
@@ -23,12 +22,6 @@ namespace PlatformRestore.Services
         }
 
         /// <inheritdoc/>
-        public void InvalidateCredentials()
-        {
-            _credential = null;
-        }
-
-        /// <inheritdoc/>
         public async Task<string> GetToken(TokenRequestContext requestContext)
         {
             AccessToken token = await GetCredential().GetTokenAsync(requestContext);
@@ -45,6 +38,12 @@ namespace PlatformRestore.Services
             }
 
             return _credential;
+        }
+
+        /// <inheritdoc/>
+        public void InvalidateCredentials()
+        {
+            _credential = null;
         }
     }
 }

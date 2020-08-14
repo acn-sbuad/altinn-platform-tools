@@ -8,7 +8,7 @@ using PlatformRestore.Services;
 namespace PlatformRestore.Commands.Settings.Subcommands
 {
     /// <summary>
-    /// Update command handler
+    /// Update command handler. Subcommand of Settings.
     /// </summary>
     [Command(
          Name = "Update",
@@ -35,7 +35,7 @@ namespace PlatformRestore.Commands.Settings.Subcommands
         public string Environment { get; set; }
 
         /// <summary>
-        /// Updated the app configuration with the provided option values.
+        /// Updates the app configuration with the provided options.
         /// </summary>
         protected override Task OnExecuteAsync(CommandLineApplication app)
         {

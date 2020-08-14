@@ -34,13 +34,13 @@ namespace PlatformRestore.Commands.Settings.Subcommands
         }
 
         /// <summary>
-        /// Logs the user out.
+        /// Logs out the user.
         /// </summary>
         protected override Task OnExecuteAsync(CommandLineApplication app)
         {
             _accessTokenService.InvalidateCredentials();
             _blobContainerClientProvider.RemoveBlobClients();
-            _documentClientProvider.RemoveDobumentClients();
+            _documentClientProvider.RemoveDocumentClients();
 
             Console.WriteLine("All credentials and clients successfully removed.");
             return Task.CompletedTask;

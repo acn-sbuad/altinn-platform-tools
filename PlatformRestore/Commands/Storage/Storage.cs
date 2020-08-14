@@ -5,7 +5,7 @@ using McMaster.Extensions.CommandLineUtils;
 namespace PlatformRestore.Commands.Storage
 {
     /// <summary>
-    /// Storage root command
+    /// Storage root command.
     /// </summary>
     [Command(
        Name = "storage",
