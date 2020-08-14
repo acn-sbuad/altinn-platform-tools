@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using Altinn.Platform.Storage.Interface.Models;
 using Azure.Storage.Blobs.Models;
 using PlatformRestore.Enums;
 
@@ -20,5 +20,15 @@ namespace PlatformRestore.Services
         /// Lists all available snapshots (versions) of the blob.
         /// </summary>
         public Task<List<string>> ListBlobVersions(string org, string app, string instanceGuid, string dataGuid);
+
+        /// <summary>
+        /// Undeletes a blob by restoring the most recent snapshot.
+        /// </summary>
+        public Task<bool> UndeleteBlob(string org, string app, string instanceGuid, string dataGuid);
+
+        /// <summary>
+        /// Gets the metadata backup for a data element.
+        /// </summary>
+        public Task<DataElement> GetDataElementBackup(string instanceGuid, string dataGuid);
     }
 }

@@ -8,7 +8,6 @@ using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using PlatformRestore.Configuration;
-using PlatformRestore.Services.Interfaces;
 
 namespace PlatformRestore.Services
 {

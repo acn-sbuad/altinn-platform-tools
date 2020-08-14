@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
-using PlatformRestore.Commands.Settings.Subcommands;
 
 namespace PlatformRestore.Commands.Settings
 {

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 using Altinn.Platform.Storage.Interface.Models;
 
-namespace PlatformRestore.Services.Interfaces
+namespace PlatformRestore.Services
 {
     /// <summary>
     /// The service that handles interaction with Azure Cosmos DB.
@@ -19,5 +19,10 @@ namespace PlatformRestore.Services.Interfaces
         /// Gets metadata for the given data element.
         /// </summary>
         public Task<DataElement> GetDataElement(string dataGuid, string instanceGuid);
+
+        /// <summary>
+        /// Stores data element metadata in cosmos.
+        /// </summary>
+        public Task<bool> SaveDataElement(DataElement dataElement);
     }
 }

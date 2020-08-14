@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 using Altinn.Platform.Storage.Interface.Models;
@@ -8,7 +9,7 @@ using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 
-namespace PlatformRestore.Services.Interfaces
+namespace PlatformRestore.Services
 {
     /// <inheritdoc/>
     public class CosmosService : ICosmosService
@@ -40,23 +41,26 @@ namespace PlatformRestore.Services.Interfaces
 
             Uri uri = UriFactory.CreateDocumentUri("Storage", "dataElements", dataGuid);
             DocumentClient client = await _clientProvider.GetDocumentClient(Program.Environment);
+            FeedOptions options;
 
             if (!string.IsNullOrEmpty(instanceGuid))
             {
-                dataElement = await client.ReadDocumentAsync<DataElement>(uri, new RequestOptions { PartitionKey = new PartitionKey(instanceGuid) });
+                options = new FeedOptions { PartitionKey = new PartitionKey(instanceGuid) };
             }
             else
             {
-                IDocumentQuery<DataElement> query = client
-                    .CreateDocumentQuery<DataElement>(_dataCollectionUri, new FeedOptions { EnableCrossPartitionQuery = true })
-                    .Where(i => i.Id == dataGuid)
-                    .AsDocumentQuery();
+                options = new FeedOptions { EnableCrossPartitionQuery = true };
+            }
 
-                FeedResponse<DataElement> result = await query.ExecuteNextAsync<DataElement>();
-                if (result.Count > 0)
-                {
-                    dataElement = result.First();
-                }
+            IDocumentQuery<DataElement> query = client
+                .CreateDocumentQuery<DataElement>(_dataCollectionUri, options)
+                .Where(i => i.Id == dataGuid)
+                .AsDocumentQuery();
+
+            FeedResponse<DataElement> result = await query.ExecuteNextAsync<DataElement>();
+            if (result.Count > 0)
+            {
+                dataElement = result.First();
             }
 
             return dataElement;
@@ -90,6 +94,16 @@ namespace PlatformRestore.Services.Interfaces
             while (continuationToken != null);
 
             return dataGuids;
+        }
+
+        /// <inheritdoc/>
+        public async Task<bool> SaveDataElement(DataElement dataElement)
+        {
+            DocumentClient client = await _clientProvider.GetDocumentClient(Program.Environment);
+            ResourceResponse<Document> createDocumentResponse = await client.CreateDocumentAsync(_dataCollectionUri, dataElement);
+            HttpStatusCode res = createDocumentResponse.StatusCode;
+
+            return res == HttpStatusCode.Created;
         }
     }
 }

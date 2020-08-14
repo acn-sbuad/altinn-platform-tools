@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Altinn.Platform.Storage.Interface.Models;
@@ -11,13 +10,13 @@ using PlatformRestore.Services;
 namespace PlatformRestore.Commands.Storage.Data
 {
     /// <summary>
-    /// Info command handler. Returns metadata about a data element.
+    /// Undelete command handler. Returns metadata about a data element.
     /// </summary>
     [Command(
-      Name = "info",
+      Name = "undelete",
       OptionsComparison = StringComparison.InvariantCultureIgnoreCase,
-      UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.CollectAndContinue)]    
-    public class Info : IBaseCmd
+      UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.CollectAndContinue)]
+    public class Undelete : IBaseCmd
     {
         /// <summary>
         /// Instance guid
@@ -28,7 +27,7 @@ namespace PlatformRestore.Commands.Storage.Data
             LongName = "dataGuid",
             ShowInHelpText = true,
             Description = "DataGuid for the data element.")]
-        [Guid]
+        [Attributes.Guid]
         [Required]
         public string DataGuid { get; set; }
 
@@ -53,7 +52,7 @@ namespace PlatformRestore.Commands.Storage.Data
             LongName = "instanceGuid",
             ShowInHelpText = true,
             Description = "InstanceGuid for the instance the dataElement is connected to.")]
-        [Guid]
+        [Attributes.Guid]
         public string InstanceGuid { get; set; }
 
         /// <summary>
@@ -78,42 +77,20 @@ namespace PlatformRestore.Commands.Storage.Data
          Description = "Application.")]
         public string App { get; set; }
 
-        /// <summary>
-        /// Boolean to include metadata from cosmos.
-        /// </summary>
-        [Option(
-          CommandOptionType.NoValue,
-          ShortName = "em",
-          LongName = "exclude-metadata",
-          ShowInHelpText = true,
-          Description = "Exclude metadata from comsos DB.")]
-        public bool ExcludeMetadata { get; set; }
-
-        /// <summary>
-        /// Boolean to include previous versions of the blob.
-        /// </summary>
-        [Option(
-          CommandOptionType.NoValue,
-          ShortName = "lv",
-          LongName = "list-versions",
-          ShowInHelpText = true,
-          Description = "List versions history of the data element.")]
-        public bool ListVersions { get; set; }
-
-        private readonly IBlobService _blobService;
         private readonly ICosmosService _cosmosService;
-    
+        private readonly IBlobService _blobService;
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="Info"/> class.
+        /// Initializes a new instance of the <see cref="Undelete"/> class.
         /// </summary>
-        public Info(ICosmosService cosmosService, IBlobService blobService)
+        public Undelete(ICosmosService cosmosService, IBlobService blobService)
         {
             _cosmosService = cosmosService;
             _blobService = blobService;
         }
 
         /// <summary>
-        /// Retrieves metadata about the dataElement
+        /// Undeletes the given data element
         /// </summary>
         protected override async Task OnExecuteAsync(CommandLineApplication app)
         {
@@ -131,58 +108,42 @@ namespace PlatformRestore.Commands.Storage.Data
                 instanceGuid = InstanceGuid ?? InstanceId.Split('/')[1];
             }
 
-            if (ListVersions && (string.IsNullOrEmpty(Org) || string.IsNullOrEmpty(App) || string.IsNullOrEmpty(instanceGuid)))
+            if (string.IsNullOrEmpty(Org) || string.IsNullOrEmpty(App) || string.IsNullOrEmpty(instanceGuid))
             {
-                Console.WriteLine("Please provide org, app and instanceGuid to retrieve previous versions when listing deleted data elements.");
+                Console.WriteLine("Please provide org, app and instanceGuid to undelete a data element.");
                 return;
             }
 
-            if (!ExcludeMetadata)
+            if (await _blobService.UndeleteBlob(Org, App, instanceGuid, DataGuid))
             {
-                string metadata = await GetMetadata(DataGuid, instanceGuid);
-                metadata = string.IsNullOrEmpty(metadata) ? "No metadata found." : metadata;
-                Console.WriteLine("-----------------------------------------------------------------------");
-                Console.WriteLine($"Metadata for data element: {instanceGuid}/{DataGuid}");
-                Console.WriteLine("-----------------------------------------------------------------------");
-                Console.WriteLine(metadata);
-                Console.WriteLine(string.Empty);
-            }
-
-            if (ListVersions)
-            {
-                List<string> versions = await GetVersions(Org, App, instanceGuid, DataGuid);
-                Console.WriteLine("-----------------------------------------------------------------------");
-                Console.WriteLine($"Versions of data element: {instanceGuid}/{DataGuid}");
-                Console.WriteLine("-----------------------------------------------------------------------");
-                foreach (string version in versions)
+                DataElement backup = await _blobService.GetDataElementBackup(instanceGuid, DataGuid);
+                if (backup != null && await _cosmosService.SaveDataElement(backup))
                 {
-                    Console.WriteLine(version);
+                    Console.WriteLine("-----------------------------------------------------------------------");
+                    Console.WriteLine($"Undelete successful. Data element restored.");
+                    Console.WriteLine(JsonConvert.SerializeObject(backup, Formatting.Indented));
+                    Console.WriteLine("-----------------------------------------------------------------------");
+                    return;
                 }
-
-                Console.WriteLine(string.Empty);
+                else
+                {
+                    Console.WriteLine("-----------------------------------------------------------------------");
+                    Console.WriteLine($"Undelete unsuccessful. Data element was not fully restored.");
+                    Console.WriteLine($"Error occured when retrieving backup and writing metadata to cosmos for");
+                    Console.WriteLine($"Please check state manually for: {Org}/{App}/{instanceGuid}/{DataGuid}. ");
+                    Console.WriteLine("-----------------------------------------------------------------------");
+                    return;
+                }
             }
-
-            CleanUp();
-        }
-
-        private async Task<string> GetMetadata(string dataGuid, string instanceGuid)
-        {
-            DataElement element = await _cosmosService.GetDataElement(dataGuid, instanceGuid);
-            return element == null ? string.Empty : JsonConvert.SerializeObject(element, Formatting.Indented);
-        }
-
-        private async Task<List<string>> GetVersions(string org, string app, string instanceGuid, string dataGuid)
-        {
-            List<string> versions = await _blobService.ListBlobVersions(org, app, instanceGuid, dataGuid);
-
-            return versions;
-        }
-
-        private void CleanUp()
-        {
-            InstanceId = InstanceGuid = null;
-            ExcludeMetadata = false;
-            ListVersions = false;
+            else
+            {
+                Console.WriteLine("-----------------------------------------------------------------------");
+                Console.WriteLine($"Undelete unsuccessful. Data element was not restored.");
+                Console.WriteLine($"Error occured when undeleting data element i blob storage.");
+                Console.WriteLine($"Please check state manually for: {Org}/{App}/{instanceGuid}/{DataGuid}. ");
+                Console.WriteLine("-----------------------------------------------------------------------");
+                return;
+            }
         }
     }
 }

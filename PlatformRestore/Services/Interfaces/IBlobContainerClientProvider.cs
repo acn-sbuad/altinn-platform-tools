@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 
-namespace PlatformRestore.Services.Interfaces
+namespace PlatformRestore.Services
 {
     /// <summary>
     /// Service that provides and administers Azure BlobContainerClients.

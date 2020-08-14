@@ -8,7 +8,6 @@ using Azure.Storage;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Options;
 using PlatformRestore.Configuration;
-using PlatformRestore.Services.Interfaces;
 
 namespace PlatformRestore.Services
 {
@@ -55,7 +54,7 @@ namespace PlatformRestore.Services
                 string blobEndpoint = $"https://{config.AccountName}.blob.core.windows.net/";
 
                 BlobServiceClient commonBlobClient = new BlobServiceClient(new Uri(blobEndpoint), new StorageSharedKeyCredential(config.AccountName, config.AccountKey));
-                client = commonBlobClient.GetBlobContainerClient($"{org}-{environment}-appsdata-blob-db");
+                client = commonBlobClient.GetBlobContainerClient(config.Container);
 
                 _clients.TryAdd(key, client);
             }

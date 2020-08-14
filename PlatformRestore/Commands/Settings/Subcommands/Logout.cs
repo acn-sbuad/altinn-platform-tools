@@ -2,9 +2,8 @@
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using PlatformRestore.Services;
-using PlatformRestore.Services.Interfaces;
 
-namespace PlatformRestore.Commands.Settings.Subcommands
+namespace PlatformRestore.Commands.Settings
 {
     /// <summary>
     /// Logout command handler. Subcommand of Settings.

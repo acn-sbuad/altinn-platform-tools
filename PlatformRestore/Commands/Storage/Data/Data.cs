@@ -11,7 +11,7 @@ namespace PlatformRestore.Commands.Storage.Data
       Name = "data",
       OptionsComparison = StringComparison.InvariantCultureIgnoreCase,
       UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.CollectAndContinue)]
-    [Subcommand(typeof(List), typeof(Info))]
+    [Subcommand(typeof(List), typeof(Info), typeof(Undelete))]
     public class Data : IBaseCmd
     {
         /// <inheritdoc/>    

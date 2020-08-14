@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
 using Azure.Core;
-using Azure.Identity;
 using McMaster.Extensions.CommandLineUtils;
 using PlatformRestore.Services;
 
-namespace PlatformRestore.Commands.Settings.Subcommands
+namespace PlatformRestore.Commands.Settings
 {
     /// <summary>
     /// Logout command handler. Subcommand of Settings.

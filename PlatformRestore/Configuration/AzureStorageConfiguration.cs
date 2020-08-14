@@ -19,6 +19,11 @@ namespace PlatformRestore.Configuration
     public class StorageAccountConfig
     {
         /// <summary>
+        /// Container name
+        /// </summary>
+        public string Container { get; set; }
+
+        /// <summary>
         /// Storage account name.
         /// </summary>
         public string AccountName { get; set; }

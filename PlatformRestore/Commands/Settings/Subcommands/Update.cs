@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using PlatformRestore.Services;
 
-namespace PlatformRestore.Commands.Settings.Subcommands
+namespace PlatformRestore.Commands.Settings
 {
     /// <summary>
     /// Update command handler. Subcommand of Settings.
