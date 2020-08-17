@@ -80,7 +80,7 @@ namespace PlatformRestore.Commands.Storage.Data
         public string App { get; set; }
 
         /// <summary>
-        /// The restore timestamp
+        /// The restore timestamp.
         /// </summary>
         [Option(
          CommandOptionType.SingleValue,
