@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Altinn.Platform.Storage.Interface.Models;
 using Azure.Storage.Blobs.Models;
@@ -27,8 +28,18 @@ namespace PlatformRestore.Services
         public Task<bool> UndeleteBlob(string org, string app, string instanceGuid, string dataGuid);
 
         /// <summary>
+        /// Restored a blob from a snapshot corresponding to the given snapshot.
+        /// </summary>
+        public Task<bool> RestoreBlob(string org, string app, string instanceGuid, string dataGuid, string restoreTimestamp);
+
+        /// <summary>
         /// Gets the metadata backup for a data element.
         /// </summary>
         public Task<DataElement> GetDataElementBackup(string instanceGuid, string dataGuid);
+
+        /// <summary>
+        /// Gets the metadata backup for a data element based on the restore timestamp.
+        /// </summary>
+        public Task<DataElement> GetDataElementBackup(string instanceGuid, string dataGuid, string restoreTimestamp = "");
     }
 }

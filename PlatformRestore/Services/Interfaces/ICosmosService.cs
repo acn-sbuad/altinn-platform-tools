@@ -24,5 +24,10 @@ namespace PlatformRestore.Services
         /// Stores data element metadata in cosmos.
         /// </summary>
         public Task<bool> SaveDataElement(DataElement dataElement);
+
+        /// <summary>
+        /// Replaces and existing document in cosmos.
+        /// </summary>
+        public Task<bool> ReplaceDataElement(DataElement dataElement);
     }
 }

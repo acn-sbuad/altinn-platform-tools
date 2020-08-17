@@ -77,7 +77,7 @@ namespace PlatformRestore.Commands.Storage.Data
          Description = "Application.")]
         public string App { get; set; }
 
-        private readonly ICosmosService _comsosService;
+        private readonly ICosmosService _cosmosService;
         private readonly IBlobService _blobService;
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace PlatformRestore.Commands.Storage.Data
         /// </summary>
         public List(ICosmosService cosmosService, IBlobService blobService)
         {
-            _comsosService = cosmosService;
+            _cosmosService = cosmosService;
             _blobService = blobService;
         }
 
@@ -154,7 +154,7 @@ namespace PlatformRestore.Commands.Storage.Data
         {
             try
             {
-                List<string> dataGuids = await _comsosService.ListDataElements(instanceGuid);
+                List<string> dataGuids = await _cosmosService.ListDataElements(instanceGuid);
 
                 if (dataGuids.Count > 0)
                 {

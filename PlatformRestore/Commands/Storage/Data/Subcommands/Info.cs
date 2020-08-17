@@ -86,7 +86,7 @@ namespace PlatformRestore.Commands.Storage.Data
           ShortName = "em",
           LongName = "exclude-metadata",
           ShowInHelpText = true,
-          Description = "Exclude metadata from comsos DB.")]
+          Description = "Exclude metadata from Cosmos DB.")]
         public bool ExcludeMetadata { get; set; }
 
         /// <summary>

@@ -10,13 +10,13 @@ using PlatformRestore.Services;
 namespace PlatformRestore.Commands.Storage.Data
 {
     /// <summary>
-    /// Undelete command handler. Returns metadata about a data element.
+    /// Restore command handler. Retores a data element to a given snapshot.
     /// </summary>
     [Command(
-      Name = "undelete",
-      OptionsComparison = StringComparison.InvariantCultureIgnoreCase,
-      UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.CollectAndContinue)]
-    public class Undelete : IBaseCmd
+       Name = "restore",
+       OptionsComparison = StringComparison.InvariantCultureIgnoreCase,
+       UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.CollectAndContinue)]
+    public class Restore : IBaseCmd
     {
         /// <summary>
         /// Instance guid
@@ -79,79 +79,82 @@ namespace PlatformRestore.Commands.Storage.Data
         [Required]
         public string App { get; set; }
 
+        /// <summary>
+        /// The restore timestamp
+        /// </summary>
+        [Option(
+         CommandOptionType.SingleValue,
+         ShortName = "rt",
+         LongName = "restoreTimestamp",
+         ShowInHelpText = true,
+         Description = "Restore timestamp.")]
+        [Required]
+        public string RestoreTimestamp { get; set; }
+
         private readonly ICosmosService _cosmosService;
         private readonly IBlobService _blobService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Undelete"/> class.
+        /// Initializes a new instance of the <see cref="Restore"/> class.
         /// </summary>
-        public Undelete(ICosmosService cosmosService, IBlobService blobService)
+        public Restore(ICosmosService cosmosService, IBlobService blobService)
         {
             _cosmosService = cosmosService;
             _blobService = blobService;
         }
 
-        /// <summary>
-        /// Undeletes the given data element
-        /// </summary>
+        /// <inheritdoc/>
         protected override async Task OnExecuteAsync(CommandLineApplication app)
         {
             if (string.IsNullOrEmpty(Program.Environment))
             {
                 Console.WriteLine("Please set the environment context before using this command.");
                 Console.WriteLine("Update environment using cmd: settings update -e [environment] \n ");
-                CleanUp();
                 return;
             }
 
-            string instanceGuid = string.Empty;
-
-            if (!string.IsNullOrEmpty(InstanceGuid) || !string.IsNullOrEmpty(InstanceId))
+            if (string.IsNullOrEmpty(InstanceId) && string.IsNullOrEmpty(InstanceGuid))
             {
-                instanceGuid = InstanceGuid ?? InstanceId.Split('/')[1];
-            }
-
-            if (string.IsNullOrEmpty(instanceGuid))
-            {
-                Console.WriteLine("One of the fields --instanceGuid or --instanceId are required.");
-                CleanUp();
+                Console.WriteLine("Please provide an instanceId or instanceGuid");
                 return;
             }
 
-            if (await _blobService.UndeleteBlob(Org, App, instanceGuid, DataGuid))
+            string instanceGuid = InstanceGuid ?? InstanceId.Split('/')[1];
+
+            try
             {
-                DataElement backup = await _blobService.GetDataElementBackup(instanceGuid, DataGuid);
-                if (backup != null && await _cosmosService.SaveDataElement(backup))
+                if (await _blobService.RestoreBlob(Org, App, instanceGuid, DataGuid, RestoreTimestamp))
                 {
-                    Console.WriteLine("-----------------------------------------------------------------------");
-                    Console.WriteLine($"Undelete successful. Data element restored.");
-                    Console.WriteLine(JsonConvert.SerializeObject(backup, Formatting.Indented));
-                    Console.WriteLine("-----------------------------------------------------------------------");
+                    DataElement backup = await _blobService.GetDataElementBackup(instanceGuid, DataGuid, RestoreTimestamp);
+                    if (backup != null && await _cosmosService.ReplaceDataElement(backup))
+                    {
+                        Console.WriteLine("-----------------------------------------------------------------------");
+                        Console.WriteLine($"Restore successful. Data element restored.");
+                        Console.WriteLine(JsonConvert.SerializeObject(backup, Formatting.Indented));
+                        Console.WriteLine("-----------------------------------------------------------------------");
+                    }
+                    else
+                    {
+                        Console.WriteLine("-----------------------------------------------------------------------");
+                        Console.WriteLine($"Restore was unsuccessful. Data element was not fully restored.");
+                        Console.WriteLine($"Error occured when retrieving backup and writing metadata to cosmos for");
+                        Console.WriteLine($"Please check state manually for: {Org}/{App}/{instanceGuid}/{DataGuid}. ");
+                        Console.WriteLine("-----------------------------------------------------------------------");
+                    }
                 }
                 else
                 {
                     Console.WriteLine("-----------------------------------------------------------------------");
-                    Console.WriteLine($"Undelete unsuccessful. Data element was not fully restored.");
-                    Console.WriteLine($"Error occured when retrieving backup and writing metadata to cosmos for");
+                    Console.WriteLine($"Restore was unsuccessful. Data element was not restored.");
+                    Console.WriteLine($"Error occured when retrieving snapshot of data element in blob storage.");
                     Console.WriteLine($"Please check state manually for: {Org}/{App}/{instanceGuid}/{DataGuid}. ");
                     Console.WriteLine("-----------------------------------------------------------------------");
                 }
             }
-            else
+            catch (Exception e)
             {
-                Console.WriteLine("-----------------------------------------------------------------------");
-                Console.WriteLine($"Undelete unsuccessful. Data element was not restored.");
-                Console.WriteLine($"Error occured when undeleting data element in blob storage.");
-                Console.WriteLine($"Please check state manually for: {Org}/{App}/{instanceGuid}/{DataGuid}. ");
-                Console.WriteLine("-----------------------------------------------------------------------");
+                Console.WriteLine(e);
             }
-
-            CleanUp();
-        }
-
-        private void CleanUp()
-        {
-            DataGuid = InstanceId = InstanceGuid = Org = App = null;
         }
     }
 }

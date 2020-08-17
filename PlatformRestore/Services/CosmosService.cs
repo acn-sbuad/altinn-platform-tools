@@ -105,5 +105,14 @@ namespace PlatformRestore.Services
 
             return res == HttpStatusCode.Created;
         }
+
+        /// <inheritdoc/>
+        public async Task<bool> ReplaceDataElement(DataElement dataElement)
+        {
+            DocumentClient client = await _clientProvider.GetDocumentClient(Program.Environment);
+            ResourceResponse<Document> createDocumentResponse = await client.ReplaceDocumentAsync($"{_dataCollectionUri}/docs/{dataElement.Id}", dataElement);
+            HttpStatusCode res = createDocumentResponse.StatusCode;
+            return res == HttpStatusCode.OK;
+        }
     }
 }
