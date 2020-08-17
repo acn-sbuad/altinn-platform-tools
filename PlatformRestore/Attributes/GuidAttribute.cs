@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace PlatformRestore.Attributes
+namespace AltinnReStorage.Attributes
 {
     /// <summary>
     /// Guid valiation attribute.

@@ -1,17 +1,17 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using AltinnReStorage.Commands.Data;
+using AltinnReStorage.Commands.Instance;
+using AltinnReStorage.Commands.Settings;
+using AltinnReStorage.Configuration;
+using AltinnReStorage.Services;
 
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using PlatformRestore.Commands.Settings;
-using PlatformRestore.Commands.Storage;
-using PlatformRestore.Configuration;
-using PlatformRestore.Services;
-
-namespace PlatformRestore
+namespace AltinnReStorage
 {
     /// <summary>
     /// Program.
@@ -23,9 +23,10 @@ namespace PlatformRestore
         /// </summary>
         public static string Environment { get; set; }
 
-        private static readonly string _prompt = "Altinn Platform Restore";     
+        private static readonly string _prompt = "Altinn ReStorage";
         private static readonly CommandLineApplication<Settings> _settingsCmd = new CommandLineApplication<Settings>();
-        private static readonly CommandLineApplication<Storage> _storageCmd = new CommandLineApplication<Storage>();
+        private static readonly CommandLineApplication<Data> _dataCmd = new CommandLineApplication<Data>();
+        private static readonly CommandLineApplication<Instance> _instanceCmd = new CommandLineApplication<Instance>();
         private static IConfigurationRoot _configuration;
 
         /// <summary>
@@ -37,7 +38,11 @@ namespace PlatformRestore
             IServiceCollection services = GetAndRegisterServices();
             ServiceProvider serviceProvider = services.BuildServiceProvider();
 
-            _storageCmd.Conventions
+            _dataCmd.Conventions
+                .UseDefaultConventions()
+                .UseConstructorInjection(serviceProvider);
+
+            _instanceCmd.Conventions
                 .UseDefaultConventions()
                 .UseConstructorInjection(serviceProvider);
 
@@ -59,9 +64,12 @@ namespace PlatformRestore
                 string[] args = Console.ReadLine().Trim().Split(' ');
 
                 switch (args[0].ToLower())
-                {
-                    case "storage":
-                        await _storageCmd.ExecuteAsync(args);
+                {            
+                    case "data":
+                        await _dataCmd.ExecuteAsync(args);
+                        break;
+                    case "instance":
+                        await _dataCmd.ExecuteAsync(args);
                         break;
                     case "settings":
                         await _settingsCmd.ExecuteAsync(args);
@@ -69,7 +77,7 @@ namespace PlatformRestore
                     case "exit":
                         return;
                     default:
-                        Console.WriteLine($"Unknown argument {string.Join(" ", args)}, Valid commands are storage and settings.");
+                        Console.WriteLine($"Unknown argument {string.Join(" ", args)}, Valid commands are data, instance and settings.");
                         break;
                 }
             }

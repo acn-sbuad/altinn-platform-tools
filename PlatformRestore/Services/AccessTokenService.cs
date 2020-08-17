@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
+using AltinnReStorage.Configuration;
 using Azure.Core;
 using Azure.Identity;
 using Microsoft.Extensions.Options;
-using PlatformRestore.Configuration;
 
-namespace PlatformRestore.Services
+namespace AltinnReStorage.Services
 {
     /// <inheritdoc/>
     public class AccessTokenService : IAccessTokenService

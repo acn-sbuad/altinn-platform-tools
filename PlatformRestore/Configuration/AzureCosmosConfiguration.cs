@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PlatformRestore.Configuration
+namespace AltinnReStorage.Configuration
 {
     /// <summary>
     /// Class that contains a dictionary for Azure Cosmos DB account configurations.

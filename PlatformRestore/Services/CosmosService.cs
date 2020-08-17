@@ -9,7 +9,7 @@ using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 
-namespace PlatformRestore.Services
+namespace AltinnReStorage.Services
 {
     /// <inheritdoc/>
     public class CosmosService : ICosmosService

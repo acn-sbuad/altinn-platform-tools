@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 using Altinn.Platform.Storage.Interface.Models;
 
-namespace PlatformRestore.Services
+namespace AltinnReStorage.Services
 {
     /// <summary>
     /// The service that handles interaction with Azure Cosmos DB.

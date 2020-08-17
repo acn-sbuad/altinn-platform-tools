@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 
-namespace PlatformRestore.Commands.Storage.Instance
+namespace AltinnReStorage.Commands.Instance
 {
     /// <summary>
     /// Instance command handler. Subcommand of Storage.

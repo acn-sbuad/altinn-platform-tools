@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AltinnReStorage.Attributes;
+using AltinnReStorage.Enums;
+using AltinnReStorage.Services;
 using Azure.Storage.Blobs.Models;
 using McMaster.Extensions.CommandLineUtils;
-using PlatformRestore.Attributes;
-using PlatformRestore.Enums;
-using PlatformRestore.Services;
 
-namespace PlatformRestore.Commands.Storage.Data
+namespace AltinnReStorage.Commands.Data
 {
     /// <summary>
     /// List command handler. Lists data elements based on given parameters.

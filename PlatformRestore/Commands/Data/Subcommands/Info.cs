@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Altinn.Platform.Storage.Interface.Models;
+using AltinnReStorage.Attributes;
+using AltinnReStorage.Services;
 using McMaster.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
-using PlatformRestore.Attributes;
-using PlatformRestore.Services;
 
-namespace PlatformRestore.Commands.Storage.Data
+namespace AltinnReStorage.Commands.Data
 {
     /// <summary>
     /// Info command handler. Returns metadata about a data element.
@@ -16,7 +16,7 @@ namespace PlatformRestore.Commands.Storage.Data
     [Command(
       Name = "info",
       OptionsComparison = StringComparison.InvariantCultureIgnoreCase,
-      UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.CollectAndContinue)]    
+      UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.CollectAndContinue)]
     public class Info : IBaseCmd
     {
         /// <summary>
@@ -102,7 +102,7 @@ namespace PlatformRestore.Commands.Storage.Data
 
         private readonly IBlobService _blobService;
         private readonly ICosmosService _cosmosService;
-    
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Info"/> class.
         /// </summary>
@@ -154,9 +154,16 @@ namespace PlatformRestore.Commands.Storage.Data
                 Console.WriteLine("-----------------------------------------------------------------------");
                 Console.WriteLine($"Versions of data element: {instanceGuid}/{DataGuid}");
                 Console.WriteLine("-----------------------------------------------------------------------");
-                foreach (string version in versions)
+                if (versions.Count == 0)
                 {
-                    Console.WriteLine(version);
+                    Console.WriteLine($"No version history found.");
+                }
+                else
+                {
+                    foreach (string version in versions)
+                    {
+                        Console.WriteLine(version);
+                    }
                 }
 
                 Console.WriteLine(string.Empty);

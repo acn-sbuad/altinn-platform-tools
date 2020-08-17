@@ -1,7 +1,7 @@
 ﻿using System;
 using McMaster.Extensions.CommandLineUtils;
 
-namespace PlatformRestore.Commands.Storage.Instance
+namespace AltinnReStorage.Commands.Instance
 {
     /// <summary>
     /// Info command handler. Returns metadata about an instance.

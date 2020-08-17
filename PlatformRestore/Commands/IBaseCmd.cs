@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using McMaster.Extensions.CommandLineUtils;
 
-namespace PlatformRestore.Commands
+namespace AltinnReStorage.Commands
 {
     /// <summary>
     /// Abstrac baseclass for all commands

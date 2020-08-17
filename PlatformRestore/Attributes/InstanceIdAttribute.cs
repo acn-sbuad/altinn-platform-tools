@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace PlatformRestore.Attributes
+namespace AltinnReStorage.Attributes
 {
     /// <summary>
     /// InstanceId validation attribute.

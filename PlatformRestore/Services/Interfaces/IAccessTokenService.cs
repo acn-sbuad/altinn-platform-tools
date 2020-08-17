@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
 
-namespace PlatformRestore.Services
+namespace AltinnReStorage.Services
 {
     /// <summary>
     /// Service that handles authorization towards Azure AD.

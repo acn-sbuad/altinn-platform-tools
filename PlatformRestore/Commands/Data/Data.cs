@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 
-namespace PlatformRestore.Commands.Storage.Data
+namespace AltinnReStorage.Commands.Data
 {
     /// <summary>
     /// Data command handler. Subcommand of Storage.

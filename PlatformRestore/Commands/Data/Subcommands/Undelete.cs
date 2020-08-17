@@ -2,12 +2,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Altinn.Platform.Storage.Interface.Models;
+using AltinnReStorage.Attributes;
+using AltinnReStorage.Services;
 using McMaster.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
-using PlatformRestore.Attributes;
-using PlatformRestore.Services;
 
-namespace PlatformRestore.Commands.Storage.Data
+namespace AltinnReStorage.Commands.Data
 {
     /// <summary>
     /// Undelete command handler. Returns metadata about a data element.

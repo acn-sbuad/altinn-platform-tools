@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AltinnReStorage.Configuration;
 using Azure.ResourceManager.Storage;
 using Azure.ResourceManager.Storage.Models;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Options;
-using PlatformRestore.Configuration;
 
-namespace PlatformRestore.Services
+namespace AltinnReStorage.Services
 {
     /// <inheritdoc/>
     public class BlobContainerClientProvider : IBlobContainerClientProvider

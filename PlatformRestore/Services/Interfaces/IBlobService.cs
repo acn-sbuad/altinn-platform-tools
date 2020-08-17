@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Altinn.Platform.Storage.Interface.Models;
+using AltinnReStorage.Enums;
 using Azure.Storage.Blobs.Models;
-using PlatformRestore.Enums;
 
-namespace PlatformRestore.Services
+namespace AltinnReStorage.Services
 {
     /// <summary>
     /// The service that handles interaction with Azure Blob Storage.

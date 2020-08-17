@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PlatformRestore.Configuration
+namespace AltinnReStorage.Configuration
 {
     /// <summary>
     /// Class that contains a dictionary for Azure storage account configurations.

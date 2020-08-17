@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PlatformRestore.Configuration
+namespace AltinnReStorage.Configuration
 {
     /// <summary>
     /// General settings for the application

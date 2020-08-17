@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
+
 using Altinn.Platform.Storage.Interface.Models;
-using Azure;
+using AltinnReStorage.Enums;
+
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
-using Microsoft.CSharp.RuntimeBinder;
-using Newtonsoft.Json;
-using PlatformRestore.Commands.Storage.Data;
-using PlatformRestore.Enums;
 
-namespace PlatformRestore.Services
+using Newtonsoft.Json;
+
+namespace AltinnReStorage.Services
 {
     /// <inheritdoc/>
     public class BlobService : IBlobService
@@ -55,10 +54,16 @@ namespace PlatformRestore.Services
         public async Task<DataElement> GetDataElementBackup(string instanceGuid, string dataGuid, string restoreTimestamp)
         {
             string name = $"dataElements/{instanceGuid}/{dataGuid}";
-            string snapshot = string.Empty;  
+            string snapshot = string.Empty;
 
             BlobContainerClient container = await _clientProvider.GetBlobClient("backup", Program.Environment);
             BlockBlobClient client = container.GetBlockBlobClient(name);
+
+            if (!await client.ExistsAsync())
+            {
+                return null;
+            }
+
             await client.UndeleteAsync();
 
             await foreach (BlobItem item in container.GetBlobsAsync(BlobTraits.None, BlobStates.Snapshots, name))
@@ -84,7 +89,7 @@ namespace PlatformRestore.Services
 
                 string metadata = System.Text.Encoding.UTF8.GetString(stream.ToArray());
                 DataElement backup = JsonConvert.DeserializeObject<DataElement>(metadata, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                
+
                 return backup;
             }
             catch (Exception e)
@@ -133,6 +138,11 @@ namespace PlatformRestore.Services
                 }
             }
 
+            if (!await client.ExistsAsync())
+            {
+                return new List<string>();
+            }
+
             await client.UndeleteAsync();
 
             await foreach (BlobItem i in container.GetBlobsAsync(BlobTraits.None, BlobStates.All, prefix: client.Name))
@@ -168,24 +178,15 @@ namespace PlatformRestore.Services
 
             await client.UndeleteAsync();
 
-            // make async
             IEnumerable<BlobItem> allSnapshots = container.GetBlobs(BlobTraits.None, BlobStates.Snapshots, prefix: name);
-            BlobItem snapshot = allSnapshots.First(s => s.Snapshot.Length > 0 && s.Snapshot.Equals(restoreTimestamp));
+            BlobItem snapshot = allSnapshots.FirstOrDefault(s => s.Snapshot != null && s.Snapshot.Length > 0 && s.Snapshot.Equals(restoreTimestamp));
 
-            try
+            if (snapshot != null)
             {
-                if (snapshot != null)
-                {
-                    await client.StartCopyFromUriAsync(new Uri($"{client.Uri}?snapshot={restoreTimestamp}"));
-                }
-
-                await client.DeleteIfExistsAsync(DeleteSnapshotsOption.OnlySnapshots);
-            }
-            catch (Exception e)
-            {
-                throw e;
+                await client.StartCopyFromUriAsync(new Uri($"{client.Uri}?snapshot={restoreTimestamp}"));
             }
 
+            await client.DeleteIfExistsAsync(DeleteSnapshotsOption.OnlySnapshots);
             return true;
         }
 
@@ -194,17 +195,15 @@ namespace PlatformRestore.Services
         {
             BlobContainerClient container = await _clientProvider.GetBlobClient(org, Program.Environment);
             BlockBlobClient client = container.GetBlockBlobClient($"{org}/{app}/{instanceGuid}/data/{dataGuid}");
-            try
+
+            if (!await client.ExistsAsync())
             {
-                await client.UndeleteAsync();
-                await client.DeleteIfExistsAsync(DeleteSnapshotsOption.OnlySnapshots);
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
                 return false;
             }
+
+            await client.UndeleteAsync();
+            await client.DeleteIfExistsAsync(DeleteSnapshotsOption.OnlySnapshots);
+            return true;
         }
     }
 }

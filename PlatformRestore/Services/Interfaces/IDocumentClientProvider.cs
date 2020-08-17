@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Azure.Documents.Client;
 
-namespace PlatformRestore.Services
+namespace AltinnReStorage.Services
 {
     /// <summary>
     /// Service that provides and administers Azure CosmosDB document clients.

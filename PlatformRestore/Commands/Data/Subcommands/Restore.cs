@@ -2,12 +2,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Altinn.Platform.Storage.Interface.Models;
+using AltinnReStorage.Attributes;
+using AltinnReStorage.Services;
 using McMaster.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
-using PlatformRestore.Attributes;
-using PlatformRestore.Services;
 
-namespace PlatformRestore.Commands.Storage.Data
+namespace AltinnReStorage.Commands.Data
 {
     /// <summary>
     /// Restore command handler. Retores a data element to a given snapshot.
@@ -80,7 +80,7 @@ namespace PlatformRestore.Commands.Storage.Data
         public string App { get; set; }
 
         /// <summary>
-        /// The restore timestamp.
+        /// The restore timestamp
         /// </summary>
         [Option(
          CommandOptionType.SingleValue,

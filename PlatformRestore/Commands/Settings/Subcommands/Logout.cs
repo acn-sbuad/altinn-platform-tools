@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AltinnReStorage.Services;
 using McMaster.Extensions.CommandLineUtils;
-using PlatformRestore.Services;
 
-namespace PlatformRestore.Commands.Settings
+namespace AltinnReStorage.Commands.Settings
 {
     /// <summary>
     /// Logout command handler. Subcommand of Settings.

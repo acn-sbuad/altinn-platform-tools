@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 
-namespace PlatformRestore.Commands.Settings
+namespace AltinnReStorage.Commands.Settings
 {
     /// <summary>
     /// Settings root command.

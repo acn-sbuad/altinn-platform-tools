@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using AltinnReStorage.Configuration;
 using Azure.Core;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using PlatformRestore.Configuration;
 
-namespace PlatformRestore.Services
+namespace AltinnReStorage.Services
 {
     /// <inheritdoc/>
     public class DocumentClientProvider : IDocumentClientProvider

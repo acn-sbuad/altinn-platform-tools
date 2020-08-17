@@ -1,4 +1,4 @@
-﻿namespace PlatformRestore.Enums
+﻿namespace AltinnReStorage.Enums
 {
     /// <summary>
     /// Element state.
